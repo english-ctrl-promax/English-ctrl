@@ -4,15 +4,115 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Prepositions Quiz</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0}body{background:#0f0f1a;color:#e8e4f0;font-family:Georgia,serif;min-height:100vh}button{font-family:inherit}</style>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f0f1a;color:#e8e4f0;font-family:Georgia,serif;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+.bg{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,#1a0a3a 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,#0a1a3a 0%,transparent 60%);pointer-events:none;z-index:0}
+
+/* MENU */
+#menuScreen{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.badge{background:linear-gradient(135deg,#e06c2a,#c0392b);color:#fff;font-size:11px;letter-spacing:3px;padding:4px 14px;border-radius:20px}
+.mainTitle{font-size:34px;font-weight:700;text-align:center;background:linear-gradient(135deg,#ffd6a5,#ff9a5c);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:#94a3b8;font-size:14px}
+.card{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(224,108,42,0.25);border-radius:16px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:border-color .2s}
+.card.active{border:2px solid #e06c2a;background:rgba(224,108,42,0.08)}
+.cardIcon{font-size:32px}
+.cardTitle{font-size:17px;font-weight:700;color:#ffd6a5}
+.cardSub{font-size:12px;color:#64748b}
+.tagRow{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:4px}
+.tag{background:rgba(224,108,42,0.2);border:1px solid rgba(224,108,42,0.4);color:#ffd6a5;font-size:10px;padding:2px 8px;border-radius:20px}
+.selectedLbl{font-size:11px;color:#e06c2a;margin-top:2px}
+.startBtn{margin-top:4px;padding:13px 44px;background:linear-gradient(135deg,#e06c2a,#c0392b);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;box-shadow:0 4px 20px rgba(224,108,42,0.4)}
+
+/* QUIZ */
+#quizScreen{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 16px 80px;display:none}
+.topBar{position:sticky;top:0;z-index:10;background:rgba(15,15,26,0.95);backdrop-filter:blur(12px);padding:10px 0;display:flex;align-items:center;gap:12px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.backBtn{background:transparent;border:1px solid rgba(255,255,255,0.15);color:#94a3b8;padding:6px 12px;border-radius:8px;font-size:12px;white-space:nowrap}
+.progWrap{flex:1;display:flex;align-items:center;gap:8px}
+.progBar{flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden}
+.progFill{height:100%;background:linear-gradient(90deg,#e06c2a,#ffd6a5);border-radius:3px;transition:width .3s;width:0%}
+.progTxt{font-size:11px;color:#64748b;white-space:nowrap}
+.qList{display:flex;flex-direction:column;gap:16px}
+.qCard{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 14px;display:flex;flex-direction:column;gap:10px}
+.qNum{font-size:10px;color:#e06c2a;letter-spacing:1px;font-weight:700}
+.qText{font-size:14px;line-height:1.7;color:#e2e8f0}
+.optGrid{display:flex;flex-direction:column;gap:7px}
+.optBtn{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#cbd5e1;font-size:13px;text-align:left;width:100%}
+.optBtn.chosen{background:rgba(224,108,42,0.2);border:1px solid #e06c2a;color:#ffd6a5}
+.optBtn.correct{background:rgba(34,197,94,0.12);border:1px solid #22c55e;color:#86efac}
+.optBtn.wrong{background:rgba(239,68,68,0.12);border:1px solid #ef4444;color:#fca5a5}
+.optLbl{min-width:20px;height:20px;background:rgba(255,255,255,0.08);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#94a3b8;flex-shrink:0}
+.submitWrap{position:fixed;bottom:0;left:0;right:0;padding:12px 20px;background:rgba(15,15,26,0.95);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:center;z-index:10}
+.submitBtn{padding:12px 56px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;box-shadow:0 4px 18px rgba(34,197,94,0.35)}
+
+/* RESULT */
+#resultScreen{position:relative;z-index:1;max-width:400px;margin:0 auto;padding:60px 20px 40px;display:none;flex-direction:column;align-items:center;gap:26px}
+.gradeCircle{width:90px;height:90px;border-radius:50%;border:4px solid;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900}
+.scoreNum{font-size:28px;font-weight:700}
+.scorePct{font-size:15px;color:#94a3b8}
+.resActions{display:flex;flex-direction:column;gap:10px;width:100%}
+.btn1{padding:13px;background:linear-gradient(135deg,#e06c2a,#c0392b);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700}
+.btn2{padding:13px;background:rgba(255,255,255,0.05);color:#ffd6a5;border:1px solid rgba(224,108,42,0.3);border-radius:11px;font-size:14px}
+.btn3{padding:13px;background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.08);border-radius:11px;font-size:14px}
+
+/* REVIEW */
+#reviewScreen{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 16px 80px;display:none}
+.reviewScore{color:#ffd6a5;font-weight:700;font-size:14px}
+</style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-const {useState}=React;
+<div class="bg"></div>
+
+<!-- MENU -->
+<div id="menuScreen">
+  <div class="badge">GRAMMAR</div>
+  <h1 class="mainTitle">Prepositions</h1>
+  <p class="sub">Бүлэг сонгоно уу</p>
+  <div id="chapCards"></div>
+  <button class="startBtn" onclick="startQuiz()">Эхлэх →</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quizScreen">
+  <div class="topBar">
+    <button class="backBtn" onclick="toMenu()">← Menu</button>
+    <div class="progWrap">
+      <div class="progBar"><div class="progFill" id="progFill"></div></div>
+      <span class="progTxt" id="progTxt">0/0</span>
+    </div>
+  </div>
+  <div class="qList" id="qList"></div>
+  <div class="submitWrap">
+    <button class="submitBtn" onclick="submitQuiz()">Дуусгах ✓</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="resultScreen">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+    <div class="gradeCircle" id="gradeCircle"></div>
+    <div class="scoreNum" id="scoreNum"></div>
+    <div class="scorePct" id="scorePct"></div>
+  </div>
+  <div class="resActions">
+    <button class="btn1" onclick="restart()">🔄 Дахин оролдох</button>
+    <button class="btn2" onclick="showReview()">👁 Хариулт харах</button>
+    <button class="btn3" onclick="toMenu()">🏠 Меню</button>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div id="reviewScreen">
+  <div class="topBar">
+    <button class="backBtn" onclick="showResult()">← Буцах</button>
+    <span class="reviewScore" id="reviewScore"></span>
+  </div>
+  <div class="qList" id="reviewList"></div>
+</div>
+
+<script>
+const LABELS=["A","B","C"];
 
 const chapters=[
   {
@@ -68,207 +168,199 @@ const chapters=[
     id:2,title:"Adjective + Preposition",subtitle:"26 асуулт",icon:"🎯",
     topics:["fond of","keen on","good at","interested in","afraid of"],
     questions:[
-      {id:15,text:"Her patience makes her fit ___ this job as a Primary teacher.",options:["to","for","in"],answer:1},
-      {id:16,text:"She is fond ___ designing her own necklaces and brooches.",options:["of","about","for"],answer:0},
-      {id:17,text:"Mum is frightened ___ rats.",options:["by","about","of"],answer:2},
-      {id:18,text:"My aunt Alice is great ___ cooking and she's completely hooked ___ making cupcakes.",options:["at / on","in / on","at / about"],answer:0},
-      {id:19,text:"Being hard-working and sensible is important ___ becoming successful ___ business.",options:["in / in","for / at","for / in"],answer:2},
-      {id:20,text:"Ryan is interested ___ animal photography. Now he is involved ___ a new project in Africa.",options:["in / with","about / in","in / in"],answer:2},
-      {id:21,text:"I'm keen ___ jogging every day.",options:["on","about","for"],answer:0},
-      {id:22,text:"Alan lost his new job because he was always late ___ work.",options:["to","at","for"],answer:2},
-      {id:23,text:"When you are a grown-up, you are liable ___ your actions.",options:["for","to","of"],answer:0},
-      {id:24,text:"Mum is completely mad ___ the new cookery program on TV.",options:["for","about","with"],answer:1},
-      {id:25,text:"This spectacular fireplace is made ___ white marble.",options:["from","of","with"],answer:1},
-      {id:26,text:"Teachers are always unhappy ___ lazy students.",options:["about","with","at"],answer:1},
-      {id:27,text:"I'm pleased ___ meet you, Mr. Williams. Welcome to the hotel.",options:["to","for","about"],answer:0},
-      {id:28,text:"Online videos are popular ___ most teenagers nowadays.",options:["among","for","with"],answer:2},
-      {id:29,text:"Mum is very proud ___ my marks this term. They are great!",options:["about","of","for"],answer:1},
-      {id:30,text:"The students were ready ___ the exam although they were really nervous.",options:["for","to","about"],answer:0},
-      {id:31,text:"Sorry but this comment is not relevant ___ the issue.",options:["for","with","to"],answer:2},
-      {id:32,text:"Everybody is responsible ___ the environmental problems.",options:["of","for","about"],answer:1},
-      {id:33,text:"Tom is really worried ___ tomorrow's exam.",options:["about","for","of"],answer:0},
-      {id:34,text:"Harper was really scared ___ spiders. She can't stand them!",options:["by","about","of"],answer:2},
-      {id:35,text:"Your bag is similar ___ mine.",options:["to","as","with"],answer:0},
-      {id:36,text:"I feel very sorry ___ Tina. She looks so sad.",options:["about","of","for"],answer:2},
-      {id:37,text:"Margaret Flynn watched really surprised ___ her husband when he gave her a diamond ring.",options:["at","by","of"],answer:0},
-      {id:38,text:"The man who was arrested yesterday is suspicious ___ robbing the national bank.",options:["for","of","about"],answer:1},
-      {id:39,text:"The children felt terrified ___ the strange noises they heard.",options:["about","by","of"],answer:1},
-      {id:40,text:"I'm tired ___ asking you to return my book!",options:["from","of","about"],answer:1},
+      {id:1,text:"Her patience makes her fit ___ this job as a Primary teacher.",options:["to","for","in"],answer:1},
+      {id:2,text:"She is fond ___ designing her own necklaces and brooches.",options:["of","about","for"],answer:0},
+      {id:3,text:"Mum is frightened ___ rats.",options:["by","about","of"],answer:2},
+      {id:4,text:"My aunt Alice is great ___ cooking and she's completely hooked ___ making cupcakes.",options:["at / on","in / on","at / about"],answer:0},
+      {id:5,text:"Being hard-working and sensible is important ___ becoming successful ___ business.",options:["in / in","for / at","for / in"],answer:2},
+      {id:6,text:"Ryan is interested ___ animal photography. Now he is involved ___ a new project in Africa.",options:["in / with","about / in","in / in"],answer:2},
+      {id:7,text:"I'm keen ___ jogging every day.",options:["on","about","for"],answer:0},
+      {id:8,text:"Alan lost his new job because he was always late ___ work.",options:["to","at","for"],answer:2},
+      {id:9,text:"When you are a grown-up, you are liable ___ your actions.",options:["for","to","of"],answer:0},
+      {id:10,text:"Mum is completely mad ___ the new cookery program on TV.",options:["for","about","with"],answer:1},
+      {id:11,text:"This spectacular fireplace is made ___ white marble.",options:["from","of","with"],answer:1},
+      {id:12,text:"Teachers are always unhappy ___ lazy students.",options:["about","with","at"],answer:1},
+      {id:13,text:"I'm pleased ___ meet you, Mr. Williams. Welcome to the hotel.",options:["to","for","about"],answer:0},
+      {id:14,text:"Online videos are popular ___ most teenagers nowadays.",options:["among","for","with"],answer:2},
+      {id:15,text:"Mum is very proud ___ my marks this term. They are great!",options:["about","of","for"],answer:1},
+      {id:16,text:"The students were ready ___ the exam although they were really nervous.",options:["for","to","about"],answer:0},
+      {id:17,text:"Sorry but this comment is not relevant ___ the issue.",options:["for","with","to"],answer:2},
+      {id:18,text:"Everybody is responsible ___ the environmental problems.",options:["of","for","about"],answer:1},
+      {id:19,text:"Tom is really worried ___ tomorrow's exam.",options:["about","for","of"],answer:0},
+      {id:20,text:"Harper was really scared ___ spiders. She can't stand them!",options:["by","about","of"],answer:2},
+      {id:21,text:"Your bag is similar ___ mine.",options:["to","as","with"],answer:0},
+      {id:22,text:"I feel very sorry ___ Tina. She looks so sad.",options:["about","of","for"],answer:2},
+      {id:23,text:"Margaret Flynn watched really surprised ___ her husband when he gave her a diamond ring.",options:["at","by","of"],answer:0},
+      {id:24,text:"The man who was arrested yesterday is suspicious ___ robbing the national bank.",options:["for","of","about"],answer:1},
+      {id:25,text:"The children felt terrified ___ the strange noises they heard.",options:["about","by","of"],answer:1},
+      {id:26,text:"I'm tired ___ asking you to return my book!",options:["from","of","about"],answer:1},
     ]
   }
 ];
 
-const LABELS=["A","B","C"];
+let chapIdx=0;
+let answers={};
+let currentScreen="menu";
 
-const S={
-  root:{minHeight:"100vh",background:"#0f0f1a",color:"#e8e4f0"},
-  bg:{position:"fixed",inset:0,background:"radial-gradient(ellipse at 20% 20%,#1a0a3a 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,#0a1a3a 0%,transparent 60%)",pointerEvents:"none",zIndex:0},
-  wrap:{position:"relative",zIndex:1,maxWidth:680,margin:"0 auto",padding:"0 16px 80px"},
-  menuWrap:{position:"relative",zIndex:1,maxWidth:480,margin:"0 auto",padding:"40px 20px 40px",display:"flex",flexDirection:"column",alignItems:"center",gap:14},
-  badge:{background:"linear-gradient(135deg,#e06c2a,#c0392b)",color:"#fff",fontSize:11,letterSpacing:3,padding:"4px 14px",borderRadius:20},
-  title:{fontSize:34,fontWeight:700,textAlign:"center",margin:0,background:"linear-gradient(135deg,#ffd6a5,#ff9a5c)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"},
-  sub:{color:"#94a3b8",fontSize:14,margin:0},
-  card:{width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(224,108,42,0.25)",borderRadius:16,padding:"18px 18px",display:"flex",flexDirection:"column",alignItems:"center",gap:8,cursor:"pointer",transition:"border-color .2s"},
-  cardActive:{border:"2px solid #e06c2a",background:"rgba(224,108,42,0.08)"},
-  cardIcon:{fontSize:32},
-  cardTitle:{fontSize:17,fontWeight:700,color:"#ffd6a5"},
-  cardSub:{fontSize:12,color:"#64748b"},
-  tagRow:{display:"flex",flexWrap:"wrap",gap:5,justifyContent:"center",marginTop:4},
-  tag:{background:"rgba(224,108,42,0.2)",border:"1px solid rgba(224,108,42,0.4)",color:"#ffd6a5",fontSize:10,padding:"2px 8px",borderRadius:20},
-  startBtn:{marginTop:4,padding:"13px 44px",background:"linear-gradient(135deg,#e06c2a,#c0392b)",color:"#fff",border:"none",borderRadius:12,fontSize:16,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 20px rgba(224,108,42,0.4)"},
-  topBar:{position:"sticky",top:0,zIndex:10,background:"rgba(15,15,26,0.95)",backdropFilter:"blur(12px)",padding:"10px 0",display:"flex",alignItems:"center",gap:12,marginBottom:16,borderBottom:"1px solid rgba(255,255,255,0.06)"},
-  backBtn:{background:"transparent",border:"1px solid rgba(255,255,255,0.15)",color:"#94a3b8",padding:"6px 12px",borderRadius:8,cursor:"pointer",fontSize:12,whiteSpace:"nowrap"},
-  progWrap:{flex:1,display:"flex",alignItems:"center",gap:8},
-  progBar:{flex:1,height:6,background:"rgba(255,255,255,0.08)",borderRadius:3,overflow:"hidden"},
-  progFill:{height:"100%",background:"linear-gradient(90deg,#e06c2a,#ffd6a5)",borderRadius:3,transition:"width .3s"},
-  progTxt:{fontSize:11,color:"#64748b",whiteSpace:"nowrap"},
-  qList:{display:"flex",flexDirection:"column",gap:16},
-  qCard:{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:14,padding:"16px 14px",display:"flex",flexDirection:"column",gap:10},
-  qNum:{fontSize:10,color:"#e06c2a",letterSpacing:1,fontWeight:700},
-  qText:{fontSize:14,lineHeight:1.7,color:"#e2e8f0",whiteSpace:"pre-line"},
-  optGrid:{display:"flex",flexDirection:"column",gap:7},
-  optBtn:{display:"flex",alignItems:"center",gap:9,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"9px 12px",color:"#cbd5e1",fontSize:13,cursor:"pointer",textAlign:"left",width:"100%"},
-  optChosen:{background:"rgba(224,108,42,0.2)",border:"1px solid #e06c2a",color:"#ffd6a5"},
-  optCorrect:{background:"rgba(34,197,94,0.12)",border:"1px solid #22c55e",color:"#86efac"},
-  optWrong:{background:"rgba(239,68,68,0.12)",border:"1px solid #ef4444",color:"#fca5a5"},
-  optLbl:{minWidth:20,height:20,background:"rgba(255,255,255,0.08)",borderRadius:4,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:"#94a3b8",flexShrink:0},
-  submitWrap:{position:"fixed",bottom:0,left:0,right:0,padding:"12px 20px",background:"rgba(15,15,26,0.95)",backdropFilter:"blur(12px)",borderTop:"1px solid rgba(255,255,255,0.06)",display:"flex",justifyContent:"center",zIndex:10},
-  submitBtn:{padding:"12px 56px",background:"linear-gradient(135deg,#22c55e,#16a34a)",color:"#fff",border:"none",borderRadius:12,fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 18px rgba(34,197,94,0.35)"},
-  resWrap:{position:"relative",zIndex:1,maxWidth:400,margin:"0 auto",padding:"60px 20px 40px",display:"flex",flexDirection:"column",alignItems:"center",gap:26},
-  gradeCircle:{width:90,height:90,borderRadius:"50%",border:"4px solid",display:"flex",alignItems:"center",justifyContent:"center",fontSize:36,fontWeight:900},
-  scoreNum:{fontSize:28,fontWeight:700},
-  scorePct:{fontSize:15,color:"#94a3b8"},
-  resActions:{display:"flex",flexDirection:"column",gap:10,width:"100%"},
-  btn1:{padding:"13px",background:"linear-gradient(135deg,#e06c2a,#c0392b)",color:"#fff",border:"none",borderRadius:11,fontSize:14,fontWeight:700,cursor:"pointer"},
-  btn2:{padding:"13px",background:"rgba(255,255,255,0.05)",color:"#ffd6a5",border:"1px solid rgba(224,108,42,0.3)",borderRadius:11,fontSize:14,cursor:"pointer"},
-  btn3:{padding:"13px",background:"transparent",color:"#64748b",border:"1px solid rgba(255,255,255,0.08)",borderRadius:11,fontSize:14,cursor:"pointer"},
-};
+function init(){
+  renderChapCards();
+  showScreen("menu");
+}
 
-function App(){
-  const [chapIdx,setChapIdx]=useState(0);
-  const [answers,setAnswers]=useState({});
-  const [screen,setScreen]=useState("menu");
+function renderChapCards(){
+  const container=document.getElementById("chapCards");
+  container.innerHTML="";
+  container.style.cssText="display:flex;flex-direction:column;gap:14px;width:100%";
+  chapters.forEach((c,i)=>{
+    const div=document.createElement("div");
+    div.className="card"+(chapIdx===i?" active":"");
+    div.onclick=()=>selectChap(i);
+    div.innerHTML=`
+      <div class="cardIcon">${c.icon}</div>
+      <div class="cardTitle">${c.title}</div>
+      <div class="cardSub">${c.subtitle}</div>
+      <div class="tagRow">${c.topics.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+      ${chapIdx===i?'<div class="selectedLbl">✓ Сонгосон</div>':""}
+    `;
+    container.appendChild(div);
+  });
+}
 
-  const ch=chapters[chapIdx];
-  const qs=ch.questions;
-  const score=qs.filter(q=>answers[q.id]===q.answer).length;
+function selectChap(i){
+  chapIdx=i;
+  renderChapCards();
+}
+
+function showScreen(name){
+  currentScreen=name;
+  document.getElementById("menuScreen").style.display=name==="menu"?"flex":"none";
+  document.getElementById("quizScreen").style.display=name==="quiz"?"block":"none";
+  document.getElementById("resultScreen").style.display=name==="result"?"flex":"none";
+  document.getElementById("reviewScreen").style.display=name==="review"?"block":"none";
+}
+
+function startQuiz(){
+  answers={};
+  renderQuiz();
+  showScreen("quiz");
+}
+
+function getQs(){return chapters[chapIdx].questions;}
+
+function renderQuiz(){
+  const qs=getQs();
+  const list=document.getElementById("qList");
+  list.innerHTML="";
+  qs.forEach(q=>{
+    const card=document.createElement("div");
+    card.className="qCard";
+    card.id="qcard-"+q.id;
+    card.innerHTML=`
+      <div class="qNum">Q${q.id}</div>
+      <div class="qText">${q.text}</div>
+      <div class="optGrid" id="opts-${q.id}">
+        ${q.options.map((opt,i)=>`
+          <button class="optBtn" id="opt-${q.id}-${i}" onclick="pick(${q.id},${i})">
+            <span class="optLbl">${LABELS[i]}</span>${opt}
+          </button>
+        `).join("")}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+  updateProgress();
+}
+
+function pick(qid,i){
+  answers[qid]=i;
+  const qs=getQs();
+  const q=qs.find(x=>x.id===qid);
+  q.options.forEach((_,j)=>{
+    const btn=document.getElementById(`opt-${qid}-${j}`);
+    btn.className="optBtn"+(j===i?" chosen":"");
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const qs=getQs();
+  const done=Object.keys(answers).length;
+  const total=qs.length;
+  document.getElementById("progFill").style.width=(done/total*100)+"%";
+  document.getElementById("progTxt").textContent=done+"/"+total;
+}
+
+function submitQuiz(){
+  const qs=getQs();
+  if(Object.keys(answers).length<qs.length){
+    alert(`Бүх ${qs.length} асуултад хариулна уу! (${Object.keys(answers).length} хариулсан)`);
+    return;
+  }
+  showResult();
+}
+
+function calcScore(){
+  const qs=getQs();
+  return qs.filter(q=>answers[q.id]===q.answer).length;
+}
+
+function showResult(){
+  const qs=getQs();
+  const score=calcScore();
   const pct=Math.round(score/qs.length*100);
   const grade=pct>=90?"A+":pct>=80?"A":pct>=70?"B":pct>=60?"C":pct>=50?"D":"F";
   const gc=pct>=80?"#22c55e":pct>=60?"#f59e0b":"#ef4444";
-
-  const pick=(qid,i)=>{if(screen!=="quiz")return;setAnswers(p=>({...p,[qid]:i}));};
-  const submit=()=>{
-    if(Object.keys(answers).length<qs.length){alert(`Бүх ${qs.length} асуултад хариулна уу! (${Object.keys(answers).length} хариулсан)`);return;}
-    setScreen("result");
-  };
-  const restart=()=>{setAnswers({});setScreen("quiz");};
-  const toMenu=()=>{setAnswers({});setScreen("menu");};
-
-  return(
-    <div style={S.root}>
-      <div style={S.bg}/>
-
-      {screen==="menu"&&(
-        <div style={S.menuWrap}>
-          <div style={S.badge}>GRAMMAR</div>
-          <h1 style={S.title}>Prepositions</h1>
-          <p style={S.sub}>Бүлэг сонгоно уу</p>
-          {chapters.map((c,i)=>(
-            <div key={c.id} style={{...S.card,...(chapIdx===i?S.cardActive:{})}} onClick={()=>setChapIdx(i)}>
-              <div style={S.cardIcon}>{c.icon}</div>
-              <div style={S.cardTitle}>{c.title}</div>
-              <div style={S.cardSub}>{c.subtitle}</div>
-              <div style={S.tagRow}>{c.topics.map(t=><span key={t} style={S.tag}>{t}</span>)}</div>
-              {chapIdx===i&&<div style={{fontSize:11,color:"#e06c2a",marginTop:2}}>✓ Сонгосон</div>}
-            </div>
-          ))}
-          <button style={S.startBtn} onClick={()=>setScreen("quiz")}>Эхлэх →</button>
-        </div>
-      )}
-
-      {screen==="quiz"&&(
-        <div style={S.wrap}>
-          <div style={S.topBar}>
-            <button style={S.backBtn} onClick={toMenu}>← Menu</button>
-            <div style={S.progWrap}>
-              <div style={S.progBar}><div style={{...S.progFill,width:`${Object.keys(answers).length/qs.length*100}%`}}/></div>
-              <span style={S.progTxt}>{Object.keys(answers).length}/{qs.length}</span>
-            </div>
-          </div>
-          <div style={S.qList}>
-            {qs.map(q=>(
-              <div key={q.id} style={S.qCard}>
-                <div style={S.qNum}>Q{q.id}</div>
-                <div style={S.qText}>{q.text}</div>
-                <div style={S.optGrid}>
-                  {q.options.map((opt,i)=>(
-                    <button key={i} style={{...S.optBtn,...(answers[q.id]===i?S.optChosen:{})}} onClick={()=>pick(q.id,i)}>
-                      <span style={S.optLbl}>{LABELS[i]}</span>{opt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={S.submitWrap}>
-            <button style={S.submitBtn} onClick={submit}>Дуусгах ✓</button>
-          </div>
-        </div>
-      )}
-
-      {screen==="result"&&(
-        <div style={S.resWrap}>
-          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12}}>
-            <div style={{...S.gradeCircle,borderColor:gc,color:gc}}>{grade}</div>
-            <div style={S.scoreNum}>{score}/{qs.length}</div>
-            <div style={S.scorePct}>{pct}%</div>
-          </div>
-          <div style={S.resActions}>
-            <button style={S.btn1} onClick={restart}>🔄 Дахин оролдох</button>
-            <button style={S.btn2} onClick={()=>setScreen("review")}>👁 Хариулт харах</button>
-            <button style={S.btn3} onClick={toMenu}>🏠 Меню</button>
-          </div>
-        </div>
-      )}
-
-      {screen==="review"&&(
-        <div style={S.wrap}>
-          <div style={S.topBar}>
-            <button style={S.backBtn} onClick={()=>setScreen("result")}>← Буцах</button>
-            <span style={{color:"#ffd6a5",fontWeight:700,fontSize:14}}>Хариулт — {score}/{qs.length}</span>
-          </div>
-          <div style={S.qList}>
-            {qs.map(q=>{
-              const chosen=answers[q.id],correct=q.answer,right=chosen===correct;
-              return(
-                <div key={q.id} style={{...S.qCard,borderLeft:`4px solid ${right?"#22c55e":"#ef4444"}`}}>
-                  <div style={{display:"flex",gap:8,alignItems:"center"}}>
-                    <div style={S.qNum}>Q{q.id}</div>
-                    <span>{right?"✅":"❌"}</span>
-                  </div>
-                  <div style={S.qText}>{q.text}</div>
-                  <div style={S.optGrid}>
-                    {q.options.map((opt,i)=>{
-                      const isC=i===correct,isW=i===chosen&&!isC;
-                      return(
-                        <div key={i} style={{...S.optBtn,cursor:"default",...(isC?S.optCorrect:{}),...(isW?S.optWrong:{})}}>
-                          <span style={S.optLbl}>{LABELS[i]}</span>{opt}{isC?" ✓":""}{isW?" ✗":""}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  document.getElementById("gradeCircle").textContent=grade;
+  document.getElementById("gradeCircle").style.borderColor=gc;
+  document.getElementById("gradeCircle").style.color=gc;
+  document.getElementById("scoreNum").textContent=score+"/"+qs.length;
+  document.getElementById("scorePct").textContent=pct+"%";
+  showScreen("result");
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
-("root")).render(<App/>);
+function showReview(){
+  const qs=getQs();
+  const score=calcScore();
+  document.getElementById("reviewScore").textContent="Хариулт — "+score+"/"+qs.length;
+  const list=document.getElementById("reviewList");
+  list.innerHTML="";
+  qs.forEach(q=>{
+    const chosen=answers[q.id],correct=q.answer,right=chosen===correct;
+    const card=document.createElement("div");
+    card.className="qCard";
+    card.style.borderLeft=`4px solid ${right?"#22c55e":"#ef4444"}`;
+    card.innerHTML=`
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="qNum">Q${q.id}</div>
+        <span>${right?"✅":"❌"}</span>
+      </div>
+      <div class="qText">${q.text}</div>
+      <div class="optGrid">
+        ${q.options.map((opt,i)=>{
+          const isC=i===correct,isW=i===chosen&&!isC;
+          return`<div class="optBtn${isC?" correct":""}${isW?" wrong":""}" style="cursor:default">
+            <span class="optLbl">${LABELS[i]}</span>${opt}${isC?" ✓":""}${isW?" ✗":""}
+          </div>`;
+        }).join("")}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+  showScreen("review");
+}
+
+function restart(){
+  answers={};
+  renderQuiz();
+  showScreen("quiz");
+}
+
+function toMenu(){
+  answers={};
+  showScreen("menu");
+}
+
+init();
 </script>
 </body>
 </html>
